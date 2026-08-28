@@ -1,0 +1,132 @@
+openapi: 3.0.3
+info:
+  title: St-James-st Parking API
+  version: '0.1.0'
+servers:
+  - url: https://api.example.com
+    description: Replace with your API base URL
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+  /api/auth/signup:
+    post:
+      summary: Create a user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                name:
+                  type: string
+                address:
+                  type: string
+      responses:
+        '201':
+          description: Created
+  /api/auth/login:
+    post:
+      summary: Login and receive tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: OK
+  /api/verification/request:
+    post:
+      summary: Request verification process
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                method:
+                  type: string
+                  enum: [document, postcard, invite, third_party]
+      responses:
+        '200':
+          description: Verification started
+  /api/verification/redeem-invite:
+    post:
+      summary: Redeem an invite code
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+      responses:
+        '200':
+          description: Invite redeemed
+  /api/spots:
+    get:
+      summary: List spots (GeoJSON)
+      parameters:
+        - in: query
+          name: bbox
+          schema:
+            type: string
+          description: Bounding box (minLon,minLat,maxLon,maxLat)
+      responses:
+        '200':
+          description: List of spots
+  /api/reservations:
+    post:
+      summary: Create a reservation (verified residents only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                spot_id:
+                  type: string
+                vehicle_id:
+                  type: string
+                start_at:
+                  type: string
+                  format: date-time
+                end_at:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Reservation created
+security:
+  - bearerAuth: []
